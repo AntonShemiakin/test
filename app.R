@@ -36,9 +36,12 @@ ui <- fluidPage(
   
   plotOutput("plot1", width = "700px", height = "300"),
   
-  dataTableOutput("dtable1"),
+  DT::DTOutput("dtable1"), # instead of dataTableOutput
   
-  reactableOutput("dtable2")
+  reactableOutput("dtable2"),
+  
+  textInput("name", "What's your name?"),
+  textOutput("greeting")
   
 )
 
@@ -59,12 +62,17 @@ server <- function(input, output, session) {
                                   main = "Scatter Plot by 5 random digits"), 
                              res = 96)
   
-  output$dtable1 <- renderDataTable(mtcars, 
+  output$dtable1 <- DT::renderDT(mtcars, 
                                     options = list(pageLength = 5, 
                                                    ordering = F,
-                                                   dom = 'p'))
+                                                   dom = 'p')) # instead of renderDataTable
   output$dtable2 <- renderReactable({
     reactable(mtcars)
+  })
+  
+  string <<- reactive(paste0("Hello ", input$name, "!"))
+  output$greeting <- renderText({
+    string()
   })
   
 }
